@@ -1,38 +1,46 @@
 class EventListingWorker
 
-  def perform
+  def perform(page_url)
     agent = Mechanize.new
     ## Future Events ##
-    doc   = agent.get("http://www.baychi.org/calendar")
+    doc   = agent.get(page_url)
 
     events_part = doc.search('.Content-Pane div[@class^=evsum]')
 
     events_part.each do |part|
       type_name = get_type_name(part.attr('class'))
       content    = part.search('.evdtl').last
-      dates      = content.children.detect{|c| c.name == 'b'}.text
-      dates_arr  = dates.split(' ')
       start_date = nil
       end_date   = nil
-      if dates_arr.size == 3
-        date_range = dates_arr[1].split('-')
-        start_date = Date.strptime("#{dates_arr[0]} #{date_range[0].to_i}, #{dates_arr[2]}", "%B %d, %Y")
-        end_date   = Date.strptime("#{dates_arr[0]} #{date_range[1].to_i}, #{dates_arr[2]}", "%B %d, %Y") if date_range.size == 2
-      end
-      location   = content.children.detect{|c| c.class.name == 'Nokogiri::XML::Text'}.text.gsub(/\n/, '')
+      location   = nil
+      name       = nil
+      event_url  = nil
+      if content.present?
+        dates      = content.children.detect{|c| c.name == 'b'}.try(:text)
+        dates_arr  = dates.split(' ')
+        if dates_arr.size == 3
+          date_range = dates_arr[1].split('-')
+          start_date = Date.strptime("#{dates_arr[0]} #{date_range[0].to_i}, #{dates_arr[2]}", "%B %d, %Y")
+          end_date   = Date.strptime("#{dates_arr[0]} #{date_range[1].to_i}, #{dates_arr[2]}", "%B %d, %Y") if date_range.size == 2
+        end
+        location   = content.children.detect{|c| c.class.name == 'Nokogiri::XML::Text'}.try(:text)
+        location   = location.gsub(/\n/, '') if location.present?
+      end  
       header    = part.search('.evttl').first
-      name      = header.text
-      event_url = header.children.attr('href').value
-      if event_url.include?("baychi.org")
-        res = agent.get("http://www.baychi.org/program")
-        para = res.search('.Summary-Pane p')
-        loc = para.detect{|p| p.children.children.text == 'Location'}
-        org = para.detect{|p| p.children.children.text == 'BayCHI Contact'}
-        puts "==#{loc}===#{org}"
-        description = res.search('.Content-Pane').last.text
-      end
-      Event.create(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date,
-        event_location: location, event_url: event_url, event_description: description)
+
+      if header.present?
+        name      = header.text
+        event_url = header.children.attr('href').try(:value)
+      end  
+      #if event_url.include?("baychi.org")
+      #  res = agent.get("http://www.baychi.org/program")
+      #  para = res.search('.Summary-Pane p')
+      #  loc = para.detect{|p| p.children.children.text == 'Location'}
+      #  org = para.detect{|p| p.children.children.text == 'BayCHI Contact'}
+      #  puts "==#{loc}===#{org}"
+      #  description = res.search('.Content-Pane').last.text
+      #end
+      Event.create(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date, event_location: location, event_url: event_url)
     end
 
     ## Past Events ##

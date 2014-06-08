@@ -16,13 +16,13 @@
 </p>
 
 <p>
-  <strong>Event start time:</strong>
-  <%= @event.event_start_time %>
+  <strong>Event start date:</strong>
+  <%= @event.event_start_date %>
 </p>
 
 <p>
-  <strong>Event end time:</strong>
-  <%= @event.event_end_time %>
+  <strong>Event end date:</strong>
+  <%= @event.event_end_date %>
 </p>
 
 <p>
@@ -40,5 +40,10 @@
   <%= @event.organizer_email %>
 </p>
 
-<%= link_to 'Edit', edit_event_path(@event) %> |
+<p>
+  <strong>Event Url:</strong>
+  <%= @event.event_url %>
+</p>
+
+
 <%= link_to 'Back', events_path %>

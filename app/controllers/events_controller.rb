@@ -5,6 +5,16 @@ class EventsController < ApplicationController
     @events = Event.page(params[:page]).per(30)
   end
 
+  def future_events
+    w = EventListingWorker.new.perform("http://www.baychi.org/calendar")
+    redirect_to events_path, notice: "Events added"
+  end
+
+  def past_events
+    w = EventListingWorker.new.perform("http://www.baychi.org/calendar/past")
+    redirect_to events_path, notice: "Events added"
+  end
+
   def show
   end
 
