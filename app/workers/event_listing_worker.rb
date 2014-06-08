@@ -9,6 +9,7 @@ class EventListingWorker
 
     events_part.each do |part|
       type_name   = get_type_name(part.attr('class'))
+      puts "==#{type_name}"
       content     = part.search('.evdtl').last
       start_date  = nil
       end_date    = nil
@@ -81,7 +82,7 @@ class EventListingWorker
     when 'evsum-pgm'
       'meeting'
     when 'evsum-bof'
-      'birds_of_feature'
+      'birds_of_feather'
     when 'evsum-glo'
       'generic_nonlocal'
     when 'evsum-ldr'
