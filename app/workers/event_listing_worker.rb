@@ -35,8 +35,8 @@ class EventListingWorker
         name      = header.text
         event_url = header.children.attr('href').try(:value)
       end  
-      if event_url.include?("baychi.org")
-        res = agent.get("http://www.baychi.org/program")
+      if event_url.present? && event_url.include?("baychi.org") 
+        res = agent.get(event_url)
         para = res.search('.Summary-Pane p')
         loc = para.detect{|p| p.children.children.text == 'Location' || p.children.children.text == 'LocationDirections'}.try(:text)
         loc = loc.gsub(/\n/,'').gsub(/Location/, '').gsub(/Directions/, '') if loc.present?
