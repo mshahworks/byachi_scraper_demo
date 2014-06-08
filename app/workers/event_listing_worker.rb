@@ -35,9 +35,14 @@ class EventListingWorker
         name      = header.text
         event_url = header.children.attr('href').try(:value)
       end  
-      if event_url.present? && event_url.include?("baychi.org") 
+      puts "===============#{event_url}"
+      if event_url.present? && !event_url.include?("http") 
+        puts "=={in envent...}"
+        event_url = "http://baychi.org#{event_url}"
+        puts "===============#{event_url}"
         res = agent.get(event_url)
         para = res.search('.Summary-Pane p')
+        puts "==#{para.inspect}"
         loc = para.detect{|p| p.children.children.text == 'Location' || p.children.children.text == 'LocationDirections'}.try(:text)
         loc = loc.gsub(/\n/,'').gsub(/Location/, '').gsub(/Directions/, '') if loc.present?
         org = para.detect{|p| p.children.children.text.include?('BayCHI Contact')}.try(:text)
@@ -46,12 +51,15 @@ class EventListingWorker
           org_email = org.split(/\n/)[2]
         end  
         description = res.search('.Content-Pane').to_html
+        puts "==ddddddddddddddddddd#{description}"
       end
       event = Event.where("event_name = ? and event_start_date = ? and event_end_date = ?", name, start_date, end_date).first
       if event.present?
-        event.update_attributes(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date, event_location: location, event_url: event_url, event_description: description, organizer_name: org_name, organizer_email: org_email)        
+        event.update_attributes(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date, event_location: location, event_url: event_url)
+        puts "==#{event.valid?}==#{event.errors.inspect}=======================================================rrrrrrrrrrrrrrrrr"        
+
       else
-        Event.create(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date, event_location: location, event_url: event_url, event_description: description, organizer_name: org_name, organizer_email: org_email)
+        Event.create(event_name: name, event_type: type_name, event_start_date: start_date, event_end_date: end_date, event_location: location, event_url: event_url)
       end
     end
 

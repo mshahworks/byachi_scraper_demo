@@ -29,7 +29,7 @@
           <td><%= event.event_end_date.strftime("%B %d, %Y") if event.event_end_date.present? %></td>
           <td><%= event.event_location %></td>
           <td><%= event.event_type.try(:uppercase) %></td>
-          <td><%= link_to 'Show', event %></td>
+          <!--<%#=link_to 'Show', event %></td>-->
           <td><%= link_to 'Destroy', event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
         </tr>
       <% end %>
