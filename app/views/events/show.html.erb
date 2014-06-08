@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>External:</strong>
+  <%= @event.external_id %>
+</p>
+
+<p>
+  <strong>Event name:</strong>
+  <%= @event.event_name %>
+</p>
+
+<p>
+  <strong>Event description:</strong>
+  <%= @event.event_description %>
+</p>
+
+<p>
+  <strong>Event start time:</strong>
+  <%= @event.event_start_time %>
+</p>
+
+<p>
+  <strong>Event end time:</strong>
+  <%= @event.event_end_time %>
+</p>
+
+<p>
+  <strong>Event location:</strong>
+  <%= @event.event_location %>
+</p>
+
+<p>
+  <strong>Organizer name:</strong>
+  <%= @event.organizer_name %>
+</p>
+
+<p>
+  <strong>Organizer email:</strong>
+  <%= @event.organizer_email %>
+</p>
+
+<%= link_to 'Edit', edit_event_path(@event) %> |
+<%= link_to 'Back', events_path %>
